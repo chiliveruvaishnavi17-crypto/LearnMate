@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login — Learner Study Portal</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ================================================================
+           Auth Page Specific Styles (shared with register.html)
+        ================================================================ */
+
+        .auth-page {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .auth-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .auth-logo .logo-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-logo h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin: 0 0 0.25rem;
+        }
+
+        .auth-logo p {
+            color: #6b7280;
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        .auth-divider {
+            border: none;
+            border-top: 1px solid #e5e7eb;
+            margin: 1.5rem 0;
+        }
+
+        .auth-heading {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin: 0 0 0.5rem;
+        }
+
+        .auth-subheading {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin: 0 0 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.4rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 0.9rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
+            color: #9ca3af;
+            pointer-events: none;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.6rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-family: 'Inter', sans-serif;
+            color: #1a1a2e;
+            background: #f9fafb;
+            transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.12);
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 0.9rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #9ca3af;
+            padding: 0.2rem;
+        }
+
+        .password-toggle:hover { color: #667eea; }
+
+        /* "Remember me" + "Forgot password" row */
+        .form-options {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.25rem;
+            font-size: 0.875rem;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #4b5563;
+        }
+
+        .remember-me input[type="checkbox"] {
+            accent-color: #667eea;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .remember-me label { cursor: pointer; }
+
+        .forgot-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .forgot-link:hover { text-decoration: underline; }
+
+        /* Submit button */
+        .btn-auth {
+            width: 100%;
+            padding: 0.85rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-auth:hover   { opacity: 0.9; }
+        .btn-auth:active  { transform: scale(0.99); }
+        .btn-auth:disabled { opacity: 0.7; cursor: not-allowed; }
+
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.4);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Alert boxes */
+        .auth-alert {
+            padding: 0.85rem 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .auth-alert.error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+            display: flex;
+        }
+
+        .auth-alert.success {
+            background: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
+            display: flex;
+        }
+
+        /* "Already logged in" user info box */
+        .logged-in-notice {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            color: #16a34a;
+            display: none;
+        }
+
+        /* Footer login link */
+        .auth-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        .auth-footer a {
+            color: #667eea;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .auth-footer a:hover { text-decoration: underline; }
+
+        /* Back to home */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1.25rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover { color: white; }
+
+        /* Demo credentials box */
+        .demo-box {
+            background: #f8f7ff;
+            border: 1px dashed #c4b5fd;
+            border-radius: 10px;
+            padding: 0.85rem 1rem;
+            margin-bottom: 1.25rem;
+            font-size: 0.8rem;
+            color: #5b21b6;
+        }
+
+        .demo-box strong {
+            display: block;
+            margin-bottom: 0.3rem;
+            color: #4c1d95;
+        }
+
+        .demo-box code {
+            background: rgba(109, 40, 217, 0.1);
+            padding: 0.1rem 0.35rem;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        @media (max-width: 480px) {
+            .auth-card { padding: 2rem 1.25rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-page">
+        <div style="width: 100%; max-width: 440px;">
+
+            <!-- Back to Home -->
+            <a href="index.html" class="back-link">
+                ← Back to Home
+            </a>
+
+            <!-- Auth Card -->
+            <div class="auth-card">
+
+                <!-- Logo -->
+                <div class="auth-logo">
+                    <div class="logo-icon">🎓</div>
+                    <h1>Learner Study Portal</h1>
+                    <p>Welcome back! Keep learning.</p>
+                </div>
+
+                <hr class="auth-divider">
+
+                <!-- Page Title -->
+                <h2 class="auth-heading">Sign In</h2>
+                <p class="auth-subheading">Enter your email and password to continue.</p>
+
+                <!-- Already Logged In Notice (shown by JS if user has a token) -->
+                <div class="logged-in-notice" id="loggedInNotice">
+                    ✅ You are already logged in! <a href="dashboard.html">Go to Dashboard →</a>
+                </div>
+
+                <!-- Alert Box (shown by JS on error or success) -->
+                <div class="auth-alert" id="alertBox">
+                    <span id="alertIcon">⚠️</span>
+                    <span id="alertMessage"></span>
+                </div>
+
+                <!-- ========================================================
+                     LOGIN FORM
+                ======================================================== -->
+                <form id="loginForm" novalidate>
+
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">✉️</span>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                placeholder="you@example.com"
+                                autocomplete="email"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">🔒</span>
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                placeholder="Enter your password"
+                                autocomplete="current-password"
+                                required
+                            >
+                            <button
+                                type="button"
+                                class="password-toggle"
+                                id="togglePassword"
+                                title="Show/hide password"
+                            >👁️</button>
+                        </div>
+                    </div>
+
+                    <!-- Remember Me + Forgot Password -->
+                    <div class="form-options">
+                        <div class="remember-me">
+                            <input type="checkbox" id="remember" name="remember">
+                            <label for="remember">Remember me</label>
+                        </div>
+                        <a href="#" class="forgot-link">Forgot password?</a>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn-auth" id="loginBtn">
+                        <div class="spinner" id="spinner"></div>
+                        <span id="btnText">🔑 Sign In</span>
+                    </button>
+
+                </form>
+
+                <!-- Footer Link -->
+                <div class="auth-footer">
+                    Don't have an account? <a href="register.html">Create one for free</a>
+                </div>
+
+            </div><!-- end auth-card -->
+        </div>
+    </div>
+
+    <!-- ================================================================
+         JAVASCRIPT — Login Logic
+    ================================================================ -->
+    <script>
+        const API_URL = 'http://localhost:5000/api/auth';
+
+        // ----------------------------------------------------------------
+        // Check if user is already logged in
+        // If they already have a token in localStorage, show a notice
+        // ----------------------------------------------------------------
+        window.addEventListener('DOMContentLoaded', function() {
+            const existingToken = localStorage.getItem('token');
+            if (existingToken) {
+                document.getElementById('loggedInNotice').style.display = 'block';
+            }
+        });
+
+        // ----------------------------------------------------------------
+        // Password Toggle
+        // ----------------------------------------------------------------
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const input = document.getElementById('password');
+            if (input.type === 'password') {
+                input.type = 'text';
+                this.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                this.textContent = '👁️';
+            }
+        });
+
+        // ----------------------------------------------------------------
+        // Show Alert Message
+        // ----------------------------------------------------------------
+        function showAlert(message, type) {
+            const box  = document.getElementById('alertBox');
+            const icon = document.getElementById('alertIcon');
+            const msg  = document.getElementById('alertMessage');
+
+            box.className = 'auth-alert ' + type;
+            icon.textContent = type === 'error' ? '⚠️' : '✅';
+            msg.textContent  = message;
+            box.style.display = 'flex';
+            box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // ----------------------------------------------------------------
+        // Set Button Loading State
+        // ----------------------------------------------------------------
+        function setLoading(isLoading) {
+            const btn     = document.getElementById('loginBtn');
+            const spinner = document.getElementById('spinner');
+            const text    = document.getElementById('btnText');
+
+            btn.disabled = isLoading;
+            spinner.style.display = isLoading ? 'block' : 'none';
+            text.textContent = isLoading ? 'Signing In...' : '🔑 Sign In';
+        }
+
+        // ----------------------------------------------------------------
+        // Form Submit Handler — Login Logic
+        // ----------------------------------------------------------------
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault(); // Stop browser from reloading the page
+
+            const email    = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            // ---- Frontend Validation ----
+            if (!email || !password) {
+                return showAlert('Please enter your email and password.', 'error');
+            }
+
+            // ---- Send Request to Backend ----
+            try {
+                setLoading(true);
+
+                // POST /api/auth/login
+                // We send email + password, and expect token + user info back
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // ✅ SUCCESS: Login worked!
+
+                    // 1. Save the JWT token in localStorage
+                    //    This token will be sent with future API requests
+                    //    to prove the user is logged in
+                    localStorage.setItem('token', data.token);
+
+                    // 2. Save user info so other pages can display the name etc.
+                    localStorage.setItem('user', JSON.stringify(data.data));
+
+                    // 3. Show success message
+                    showAlert(`Welcome back, ${data.data.name}! Redirecting...`, 'success');
+
+                    // 4. Redirect to dashboard after 1.5 seconds
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1500);
+
+                } else {
+                    // ❌ ERROR: Wrong email/password or server error
+                    showAlert(data.message || 'Login failed. Please check your details.', 'error');
+                }
+
+            } catch (error) {
+                console.error('Login error:', error);
+                showAlert(
+                    'Cannot connect to the server. Make sure the backend is running on port 5000.',
+                    'error'
+                );
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        // ----------------------------------------------------------------
+        // Auto-fill email if previously remembered
+        // (Simple version — for learning purposes)
+        // ----------------------------------------------------------------
+        const savedUser = localStorage.getItem('user');
+        if (savedUser) {
+            try {
+                const parsed = JSON.parse(savedUser);
+                if (parsed.email) {
+                    document.getElementById('email').value = parsed.email;
+                }
+            } catch(e) { /* ignore parse errors */ }
+        }
+    </script>
+</body>
+</html>
